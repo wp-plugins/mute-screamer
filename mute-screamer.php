@@ -4,7 +4,7 @@ Plugin Name: Mute Screamer
 Plugin URI: http://github.com/ampt/mute-screamer/
 Description: <a href="http://phpids.org/">PHPIDS</a> for Wordpress.
 Author: ampt
-Version: 0.1
+Version: 0.16
 Author URI: http://notfornoone.com/
 */
 
@@ -209,7 +209,7 @@ if( !class_exists('Mute_screamer')) {
 				'email' => get_option('admin_email'),
 				'mode' => 'production',
 				'ban_time' => 1800,
-				'exception_fields' => array( 'REQUEST.content', 'POST.content', 'REQUEST.__utmz', 'COOKIE.__utmc', 'REQUEST.s_pers', 'COOKIE.s_pers' ),
+				'exception_fields' => array( 'REQUEST.content', 'POST.content', 'REQUEST.__utmz', 'COOKIE.__utmz', 'REQUEST.s_pers', 'COOKIE.s_pers' ),
 				'html_fields' => array(),
 				'json_fields' => array()
 			);
@@ -229,6 +229,13 @@ if( !class_exists('Mute_screamer')) {
 				  PRIMARY KEY (`id`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8;"
 			);
+
+			// Do previous options exist? Merge them, this way we keep existing options
+			// and if an update adds new options they get added too.
+			$prev_options = get_option( 'mscr_options' );
+			if( is_array($prev_options) ) {
+				$options = array_merge( $options, $prev_options );
+			}
 
 			update_option( 'mscr_options', $options );
 		}

@@ -3,7 +3,7 @@ Contributors: ampt
 Tags: phpids, intrusion detection, security
 Requires at least: 3.0
 Tested up to: 3.0
-Stable tag: 0.1
+Stable tag: 0.16
 
 PHPIDS for Wordpress
 
@@ -33,6 +33,11 @@ Features:
 1. Attack logs
 
 == Changelog ==
+
+= 0.16 =
+
+* Fix default exceptions list
+* Merge existing options on activation
 
 = 0.1 =
 
