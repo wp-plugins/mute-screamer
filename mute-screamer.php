@@ -1,10 +1,10 @@
 <?php  if ( !defined('ABSPATH') ) exit;
 /*
 Plugin Name: Mute Screamer
-Plugin URI: http://github.com/ampt/mute-screamer/
+Plugin URI: http://wordpress.org/extend/plugins/mute-screamer/
 Description: <a href="http://phpids.org/">PHPIDS</a> for Wordpress.
 Author: ampt
-Version: 0.16
+Version: 0.17
 Author URI: http://notfornoone.com/
 */
 
@@ -122,13 +122,13 @@ if( !class_exists('Mute_screamer')) {
 			$config['Logging']['table'] = self::INTRUSIONS_TABLE;
 
 			// Mark fields that shouldn't be monitored
-			$config['General']['exceptions'] = $this->exception_fields ? $this->exception_fields : array();
+			$config['General']['exceptions'] = $this->exception_fields ? $this->exception_fields : FALSE;
 
 			// Mark fields that contain HTML
-			$config['General']['html'] = $this->html_fields ? $this->html_fields : array();
+			$config['General']['html'] = $this->html_fields ? $this->html_fields : FALSE;
 
 			// Mark fields that have JSON data
-			$config['General']['json'] = $this->json_fields ? $this->json_fields : array();
+			$config['General']['json'] = $this->json_fields ? $this->json_fields : FALSE;
 
 			$ids = IDS_Init::init();
 			$ids->setConfig( $config, TRUE );
@@ -181,16 +181,6 @@ if( !class_exists('Mute_screamer')) {
 			$subject = sprintf(__('[%s] Mute Screamer IDS Alert'), $data['blogname']);
 
 			wp_mail( $this->email, $subject, $message );
-		}
-
-
-		/**
-		 * Get the Mute Screamer instance
-		 *
-		 * @return	object
-		 */
-		public static function self() {
-			return $this;
 		}
 
 

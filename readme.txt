@@ -2,8 +2,8 @@
 Contributors: ampt
 Tags: phpids, intrusion detection, security
 Requires at least: 3.0
-Tested up to: 3.0
-Stable tag: 0.16
+Tested up to: 3.1-alpha
+Stable tag: 0.17
 
 PHPIDS for Wordpress
 
@@ -12,7 +12,7 @@ PHPIDS for Wordpress
 Mute Screamer uses [PHPIDS](http://phpids.org/) to detect attacks on your Wordpress site and reacts in a way that you choose.
 Currently there is support for sending an alert email when an attack is detected.
 
-Requires PHP 5.1.6 or greater.
+Requires PHP 5.1.6 or higher.
 
 
 Features:
@@ -33,6 +33,11 @@ Features:
 1. Attack logs
 
 == Changelog ==
+
+= 0.17 =
+
+* Fix search results for intrusions
+* Fix empty exception fields
 
 = 0.16 =
 
