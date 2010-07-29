@@ -4,7 +4,7 @@ Plugin Name: Mute Screamer
 Plugin URI: http://wordpress.org/extend/plugins/mute-screamer/
 Description: <a href="http://phpids.org/">PHPIDS</a> for Wordpress.
 Author: ampt
-Version: 0.17
+Version: 0.2
 Author URI: http://notfornoone.com/
 */
 
@@ -47,9 +47,9 @@ if( !class_exists('Mute_screamer')) {
 	define( 'MSCR_PATH', dirname(__FILE__) );
 	set_include_path( get_include_path() . PATH_SEPARATOR . MSCR_PATH . '/lib' );
 	require_once 'mscr/utils.php';
+	require_once 'mscr/log_database.php';
 	require_once 'IDS/Init.php';
 	require_once 'IDS/Log/Composite.php';
-	require_once 'IDS/Log/Database.php';
 
 	// PHPIDS requires a writable folder
 	if( !is_writable(Utils::upload_path()) ) {
@@ -60,11 +60,16 @@ if( !class_exists('Mute_screamer')) {
 	 * Mute Screamer
 	 */
 	class Mute_screamer {
-		const INTRUSIONS_TABLE = 'mscr_intrusions';
-		private $email = '';
-		private $email_notifications = '';
-		private $email_threshold = '';
-		private $result = FALSE;
+		const INTRUSIONS_TABLE 			= 'mscr_intrusions';
+		private static $instance 		= NULL;
+		private $email 					= '';
+		private $email_notifications 	= '';
+		private $email_threshold 		= '';
+		private $exception_fields 		= array();
+		private $html_fields 			= array();
+		private $json_fields 			= array();
+		private $new_intrusions_count 	= 0;
+		private $result 				= FALSE;
 
 		/**
 		 * Constructor
@@ -74,11 +79,7 @@ if( !class_exists('Mute_screamer')) {
 		 * @return	object
 		 */
 		public function __construct() {
-			$options = get_option( 'mscr_options' );
-
-			foreach( array('email', 'email_notifications', 'email_threshold', 'exception_fields', 'html_fields', 'json_fields' ) as $key ) {
-				$this->$key = isset( $options[$key] ) ? $options[$key] : FALSE;
-			}
+			self::$instance = $this;
 
 			$this->init();
 			$this->run();
@@ -91,6 +92,8 @@ if( !class_exists('Mute_screamer')) {
 		 * @return	void
 		 */
 		private function init() {
+			$this->init_options();
+
 			if( is_admin() ) {
 				require_once 'mscr_admin.php';
 				new Mscr_admin();
@@ -153,8 +156,9 @@ if( !class_exists('Mute_screamer')) {
 			$this->result = $ids->run();
 
 			if( !$this->result->isEmpty() ) {
+				$this->update_intrusion_count();
 				$compositeLog = new IDS_Log_Composite();
-				$compositeLog->addLogger(IDS_Log_Database::getInstance($init));
+				$compositeLog->addLogger( new mscr_log_database() );
 				$compositeLog->execute($this->result);
 
 				if( $this->email_notifications ) {
@@ -185,6 +189,69 @@ if( !class_exists('Mute_screamer')) {
 
 
 		/**
+		 * Get the Mute Screamer instance
+		 *
+		 * @return	object
+		 */
+		public static function instance() {
+			return self::$instance;
+		}
+
+
+		/**
+		 * Retrieve options
+		 *
+		 * @param	string
+		 * @return	mixed
+		 */
+		public function get_option( $key = '' ) {
+			return isset( $this->$key ) ? $this->$key : FALSE;
+		}
+
+
+		/**
+		 * Update options
+		 *
+		 * @param	string
+		 * @param	mixed
+		 * @return	void
+		 */
+		public function set_option( $key = '', $val = '' ) {
+			$options = get_option( 'mscr_options' );
+			if( ! isset( $options[$key] ))
+				return;
+
+			$options[$key] = $val;
+			update_option( 'mscr_options', $options );
+			$this->init_options();
+		}
+
+
+		/**
+		 * Initialse options
+		 *
+		 * @return	void
+		 */
+		private function init_options() {
+			$options = get_option( 'mscr_options' );
+			foreach( array('email', 'email_notifications', 'email_threshold', 'exception_fields', 'html_fields', 'json_fields', 'new_intrusions_count' ) as $key ) {
+				$this->$key = isset( $options[$key] ) ? $options[$key] : FALSE;
+			}
+		}
+
+
+		/**
+		 * Update intrusion count for menu
+		 *
+		 * @return	void
+		 */
+		private function update_intrusion_count() {
+			$new_count = $this->new_intrusions_count + count($this->result->getIterator());
+			$this->set_option( 'new_intrusions_count', $new_count );
+		}
+
+
+		/**
 		 * Setup options, database table on activation
 		 *
 		 * @return	void
@@ -197,11 +264,10 @@ if( !class_exists('Mute_screamer')) {
 				'email_threshold' => 10,
 				'email_notifications' => FALSE,
 				'email' => get_option('admin_email'),
-				'mode' => 'production',
-				'ban_time' => 1800,
 				'exception_fields' => array( 'REQUEST.content', 'POST.content', 'REQUEST.__utmz', 'COOKIE.__utmz', 'REQUEST.s_pers', 'COOKIE.s_pers' ),
 				'html_fields' => array(),
-				'json_fields' => array()
+				'json_fields' => array(),
+				'new_intrusions_count' => 0
 			);
 
 			// Attack attempts database table

@@ -8,6 +8,11 @@ class Mscr_admin {
 	 * Constructor
 	 */
 	public function __construct() {
+		// Reset new instrusions badge for admin menu
+		// Must be called before register_setting
+		if( isset( $_GET['page'] ) && $_GET['page'] == 'mscr_intrusions' )
+			Mute_screamer::instance()->set_option( 'new_intrusions_count', 0 );
+
 		add_action( 'admin_init', array($this, 'admin_init') );
 		add_action( 'admin_menu', array($this, 'admin_menu') );
 		add_filter( 'screen_settings', array($this, 'screen_settings'), 10, 2 );
@@ -21,6 +26,8 @@ class Mscr_admin {
 	 * @return	void
 	 */
 	public function admin_init() {
+		// Once a setting is registered adding/updating options
+		// will run options_validate, which we may not want in all cases
 		register_setting( 'mscr_options', 'mscr_options', array($this, 'options_validate') );
 		$this->do_action();
 	}
@@ -125,7 +132,9 @@ class Mscr_admin {
 	 * @return	void
 	 */
 	public function admin_menu() {
-		add_dashboard_page( __('Mute Screamer Intrusions'), __('Intrusions'), 'activate_plugins', 'mscr_intrusions', array($this, 'intrusions') );
+		$intrusion_count = (int) Mute_screamer::instance()->get_option( 'new_intrusions_count' );
+		$intrusions_menu_title = sprintf( __('Intrusions %s'), "<span class='update-plugins count-$intrusion_count' title='$intrusion_count'><span class='update-count'>" . number_format_i18n($intrusion_count) . "</span></span>" );
+		add_dashboard_page( __('Mute Screamer Intrusions'), $intrusions_menu_title, 'activate_plugins', 'mscr_intrusions', array($this, 'intrusions') );
 		add_options_page( __('Mute Screamer Configuration'), __('Mute Screamer'), 'activate_plugins', 'mscr_options', array($this, 'options') );
 	}
 
@@ -205,13 +214,15 @@ class Mscr_admin {
 	 *
 	 * @return	array
 	 */
-	public function options_validate( $input ) {
+	public function options_validate( $input = array() ) {
 		$options = get_option( 'mscr_options' );
 
 		foreach( array( 'email', 'email_threshold', 'exception_fields', 'html_fields', 'json_fields' ) as $key ) {
-			if( isset($input[$key]) ) {
-				$options[$key] = $input[$key];
+			if( ! isset($input[$key]) ) {
+				continue;
 			}
+
+			$options[$key] = $input[$key];
 
 			switch($key) {
 				case 'email':

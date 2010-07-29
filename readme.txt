@@ -1,9 +1,9 @@
 === Mute Screamer ===
 Contributors: ampt
-Tags: phpids, intrusion detection, security
+Tags: phpids, intrusion detection, security, ids
 Requires at least: 3.0
 Tested up to: 3.1-alpha
-Stable tag: 0.17
+Stable tag: 0.2
 
 PHPIDS for Wordpress
 
@@ -33,6 +33,11 @@ Features:
 1. Attack logs
 
 == Changelog ==
+
+= 0.2 =
+
+* Use wpdb instead of PDO for database logging
+* Show new instrusions count badge in dashboard menu
 
 = 0.17 =
 
