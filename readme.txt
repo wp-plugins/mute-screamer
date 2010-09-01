@@ -34,7 +34,7 @@ Features:
 
 == Changelog ==
 
-= 0.3.0 =
+= 0.3 =
 
 * Requires PHP 5.2+
 * Better IP detection
@@ -44,25 +44,25 @@ Features:
 * Display a custom warning page to the user
 * Bug: strip slashes of value before insertion into the database
 
-= 0.2.2 =
+= 0.22 =
 
 * Fix missing fields in database logger
 
-= 0.2.0 =
+= 0.2 =
 
 * Use wpdb instead of PDO for database logging
 * Show new instrusions count badge in dashboard menu
 
-= 0.1.7 =
+= 0.17 =
 
 * Fix search results for intrusions
 * Fix empty exception fields
 
-= 0.1.6 =
+= 0.16 =
 
 * Fix default exceptions list
 * Merge existing options on activation
 
-= 0.1.0 =
+= 0.1 =
 
 * Initial release.
