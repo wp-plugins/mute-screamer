@@ -18,7 +18,7 @@ class mscr_log_database implements IDS_Log_Interface {
      *
      * @var string
      */
-    private $ip = 'local/unknown';
+    private $ip = '0.0.0.0';
 
 
 	/**
@@ -27,12 +27,7 @@ class mscr_log_database implements IDS_Log_Interface {
 	 * @return	void
 	 */
 	public function __construct() {
-		// Determine correct IP address
-		if( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-			$this->ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			$this->ip = $_SERVER['REMOTE_ADDR'];
-		}
+		$this->ip = MSCR_Utils::ip_address();
 	}
 
 
@@ -54,7 +49,7 @@ class mscr_log_database implements IDS_Log_Interface {
 
 		foreach( $report_data as $event ) {
 			$data['name'] = $event->getName();
-			$data['value'] = $event->getValue();
+			$data['value'] = stripslashes( $event->getValue() );
 			$data['page'] = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
 			$data['tags'] = implode( ', ', $event->getTags() );
 			$data['ip'] = $this->ip;
