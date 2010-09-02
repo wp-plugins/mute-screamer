@@ -3,7 +3,7 @@ Contributors: ampt
 Tags: phpids, intrusion detection, security, ids
 Requires at least: 3.0
 Tested up to: 3.1-alpha
-Stable tag: 0.30
+Stable tag: 0.31
 
 PHPIDS for Wordpress
 
@@ -34,7 +34,7 @@ Features:
 
 == Changelog ==
 
-= 0.30 =
+= 0.31 =
 
 * Requires PHP 5.2+
 * Better IP detection
