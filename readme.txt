@@ -3,7 +3,7 @@ Contributors: ampt
 Tags: phpids, intrusion detection, security, ids
 Requires at least: 3.0
 Tested up to: 3.1-alpha
-Stable tag: 0.31
+Stable tag: 0.32
 
 PHPIDS for Wordpress
 
@@ -33,6 +33,10 @@ Features:
 1. Attack logs
 
 == Changelog ==
+
+= 0.32 =
+
+* Fix where Mute Screamer would only allow bulk actions to run on Mute Screamer's intrusions page
 
 = 0.31 =
 
