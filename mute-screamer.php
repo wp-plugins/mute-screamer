@@ -4,7 +4,7 @@ Plugin Name: Mute Screamer
 Plugin URI: http://wordpress.org/extend/plugins/mute-screamer/
 Description: <a href="http://phpids.org/">PHPIDS</a> for Wordpress.
 Author: ampt
-Version: 0.32
+Version: 0.58
 Author URI: http://notfornoone.com/
 */
 
@@ -61,6 +61,7 @@ if( !class_exists('Mute_screamer')) {
 	 */
 	class Mute_screamer {
 		const INTRUSIONS_TABLE 			= 'mscr_intrusions';
+		const VERSION		 			= '0.58';
 		private static $instance 		= NULL;
 		private $email 					= '';
 		private $email_notifications 	= '';
@@ -96,6 +97,7 @@ if( !class_exists('Mute_screamer')) {
 
 			// Are we in the WP Admin?
 			if( is_admin() ) {
+				require_once 'mscr/Update.php';
 				require_once 'mscr_admin.php';
 				new Mscr_admin();
 			}
@@ -283,7 +285,7 @@ if( !class_exists('Mute_screamer')) {
 
 			$options[$key] = $val;
 			update_option( 'mscr_options', $options );
-			$this->init_options();
+			$this->$key = $val;
 		}
 
 
@@ -294,7 +296,21 @@ if( !class_exists('Mute_screamer')) {
 		 */
 		private function init_options() {
 			$options = get_option( 'mscr_options' );
-			foreach( array('email', 'email_notifications', 'email_threshold', 'exception_fields', 'html_fields', 'json_fields', 'new_intrusions_count', 'enable_admin', 'warning_threshold', 'warning_wp_admin' ) as $key ) {
+			$default_options = array(
+				'db_version',
+				'email',
+				'email_notifications',
+				'email_threshold',
+				'exception_fields',
+				'html_fields',
+				'json_fields',
+				'new_intrusions_count',
+				'enable_admin',
+				'warning_threshold',
+				'warning_wp_admin'
+			);
+
+			foreach( $default_options as $key ) {
 				$this->$key = isset( $options[$key] ) ? $options[$key] : FALSE;
 			}
 		}
@@ -402,7 +418,7 @@ if( !class_exists('Mute_screamer')) {
 	}
 
 	// Register activation, deactivation and uninstall hooks,
-	// start Mute Screamer once all plugins are loaded
+	// run Mute Screamer on init
 	if( !defined('WP_UNINSTALL_PLUGIN') ) {
 		register_activation_hook( __FILE__, 'Mute_screamer::activate' );
 		register_deactivation_hook( __FILE__, 'Mute_screamer::deactivate' );

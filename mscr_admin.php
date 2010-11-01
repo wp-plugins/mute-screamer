@@ -12,6 +12,18 @@ class Mscr_admin {
 		add_action( 'admin_menu', array($this, 'admin_menu') );
 		add_filter( 'screen_settings', array($this, 'screen_settings'), 10, 2 );
 		add_filter( 'set-screen-option', array($this, 'set_screen_option'), 10, 3 );
+
+		// Run update routines
+		$update = MSCR_Update::instance();
+		$update->update_check();
+
+		// Display Mute Screamer updates in the Wordpress update admin page
+		add_action( 'core_upgrade_preamble', array( $update, 'list_mscr_updates' ) );
+
+		// Update Mute Screamer actions
+		add_action( 'update-custom_mscr_upgrade_diff', array( $update, 'do_upgrade_diff' ) );
+		add_action( 'update-custom_mscr_upgrade', array( $update, 'do_upgrade' ) );
+		add_action( 'update-custom_mscr_upgrade_run', array( $update, 'do_upgrade_run' ) );
 	}
 
 
@@ -22,15 +34,18 @@ class Mscr_admin {
 	 */
 	public function admin_init() {
 		// Are we on Mute Screamer's intrusions page?
-		if( $this->page() == 'mscr_intrusions' ) {
+		if( MSCR_Utils::get( 'page' ) == 'mscr_intrusions' ) {
 			// Handle bulk actions
 			$this->do_action();
 
 			// Reset new instrusions badge for admin menu
-			// Must be called before register_setting
+			// Must be called before register_setting, becuase it updates options
 			Mute_screamer::instance()->set_option( 'new_intrusions_count', 0 );
 			return;
 		}
+
+		// Add admin CSS
+		wp_enqueue_style( 'mscr_styles', WP_PLUGIN_URL . '/mute-screamer/css/mscr.css', array(), Mute_screamer::VERSION );
 
 		// Once a setting is registered adding/updating options
 		// will run options_validate, which we may not want in all cases
@@ -141,8 +156,45 @@ class Mscr_admin {
 		$intrusions_menu_title = sprintf( __('Intrusions %s'), "<span class='update-plugins count-$intrusion_count' title='$intrusion_count'><span class='update-count'>" . number_format_i18n($intrusion_count) . "</span></span>" );
 		add_dashboard_page( __('Mute Screamer Intrusions'), $intrusions_menu_title, 'activate_plugins', 'mscr_intrusions', array($this, 'intrusions') );
 		add_options_page( __('Mute Screamer Configuration'), __('Mute Screamer'), 'activate_plugins', 'mscr_options', array($this, 'options') );
+
+		// Modify the Dashboard menu updates count
+		$this->set_update_badge();
 	}
 
+	/**
+	 * Change the updates badge in the Dashboard menu
+	 * if there are updates available for Mute Screamer
+	 *
+	 * @return	void
+	 */
+	private function set_update_badge() {
+		global $submenu;
+		$updates = get_site_transient( 'mscr_update' );
+
+		if( $updates === FALSE OR empty( $updates['updates'] ) )
+			return;
+
+		if( ! isset( $submenu['index.php'] ) )
+			return;
+
+		$update_count = count( $updates );
+		$existing_count = 0;
+
+		// Find the update-core submenu
+		foreach( $submenu['index.php'] as &$item ) {
+			if( isset( $item[2] ) && $item[2] == 'update-core.php' ) {
+				// Is there already an update badge? Get existing update count
+				if( strpos( $item[0], '<span' ) !== FALSE ) {
+					$existing_count = preg_replace('/.+?<span\b[^>]*><span\b[^>]*>(\d+)<\/span><\/span>/', '$1', $item[0]);
+				}
+
+				$update_count += (int) $existing_count;
+				$update_title = sprintf(_n('%d Update', '%d Updates', $update_count), $update_count);
+				$item[0] = sprintf( __('Updates %s'), "<span class='update-plugins count-$update_count' title='$update_title'><span class='update-count'>" . number_format_i18n($update_count) . "</span></span>");
+				break;
+			}
+		}
+	}
 
 	/**
 	 * Display PHPIDS Intrusions
@@ -190,7 +242,6 @@ class Mscr_admin {
 			'tags' => 'Tags',
 			'ip' => 'IP',
 			'impact' => 'Impact',
-			'origin' => 'Origin',
 			'date' => 'Date'
 		);
 		$columns = apply_filters('mscr_admin_intrusions_columns', $columns);
@@ -273,23 +324,16 @@ class Mscr_admin {
 	 *
 	 * @return	void
 	 */
-	public function options()
-	{
+	public function options() {
+		//$url = 'options-general.php?page=mscr_options&action=update_phpids';
+		//request_filesystem_credentials($url, '', true, ABSPATH);
+		//return;
+
 		$options = get_option( 'mscr_options' );
 		$options['exception_fields'] = implode("\r\n", $options['exception_fields']);
 		$options['html_fields'] = implode("\r\n", $options['html_fields']);
 		$options['json_fields'] = implode("\r\n", $options['json_fields']);
 
 		MSCR_Utils::view('admin_options', $options);
-	}
-
-
-	/**
-	 * Retrieve the admin page variable
-	 *
-	 * @return	string|bool
-	 */
-	private function page() {
-		return isset( $_GET['page'] ) ? $_GET['page'] : FALSE;
 	}
 }

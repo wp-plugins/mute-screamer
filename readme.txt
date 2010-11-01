@@ -3,7 +3,7 @@ Contributors: ampt
 Tags: phpids, intrusion detection, security, ids
 Requires at least: 3.0
 Tested up to: 3.1-alpha
-Stable tag: 0.32
+Stable tag: 0.58
 
 PHPIDS for Wordpress
 
@@ -20,6 +20,8 @@ Features:
 * Configure PHPIDS exceptions, html and json fields
 * Display a warning page
 * Log users out of WP Admin
+* Auto updates of default_filter.xml and Converter.php from phpids.org
+* Auto update shows a diff of changes to be updated
 * Removes all options and database tables when deleted via the Plugins admin page
 
 == Installation ==
@@ -31,8 +33,15 @@ Features:
 == Screenshots ==
 
 1. Attack logs
+2. Auto update diff
 
 == Changelog ==
+
+= 0.58 =
+
+* Automatic updates of default_filter.xml and Converter.php from phpids.org
+* Show a diff of changes during the auto update process
+* Remove source column from intrusions list
 
 = 0.32 =
 
