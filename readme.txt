@@ -2,8 +2,8 @@
 Contributors: ampt
 Tags: phpids, intrusion detection, security, ids
 Requires at least: 3.0
-Tested up to: 3.1-alpha
-Stable tag: 0.59
+Tested up to: 3.1
+Stable tag: 1.0.0-beta
 
 PHPIDS for Wordpress
 
@@ -15,20 +15,24 @@ Requires PHP 5.2 or higher.
 
 Features:
 
-* View attack logs. Go to WP-Admin -> Dashboard -> Intrusions
+* View attack logs. Go to Dashboard -> Intrusions
 * Send alert emails
 * Configure PHPIDS exceptions, html and json fields
 * Display a warning page
 * Log users out of WP Admin
 * Auto updates of default_filter.xml and Converter.php from phpids.org
 * Auto update shows a diff of changes to be updated
-* Removes all options and database tables when deleted via the Plugins admin page
+* Ban user when attack is over the ban threshold
+* Ban user when attack exceeds the repeat attack limit
+* Display ban template and message
 
 == Installation ==
 
+Use automatic installer or:
+
 1. Copy the mute-screamer folder into /wp-content/plugins
-2. Activate Mute Screamer via the plugins page in the Wordpress admin
-3. Go to WP-Admin -> Settings -> Mute Screamer to configure
+2. Activate Mute Screamer via the plugins page in the WordPress admin
+3. Go to Settings -> Mute Screamer to configure
 
 == Screenshots ==
 
@@ -36,6 +40,25 @@ Features:
 2. Auto update diff
 
 == Changelog ==
+
+= 1.0.0 =
+
+* Latest rules and converter
+* Add comments field to default exceptions
+* Fix local file path leakage
+* Gracefully handle requirements
+* Fix bulk actions on intrusions page
+* i18n support
+* Add delete & exclude actions to intrusions page
+* Add contextual help
+* Email throttling
+* Update 500 error template
+* Update phpids update url
+* ip banning
+* Fix admin footer in update process
+* Fix redirect loop
+* Run PHPIDS on wp-login.php
+* Don't run the update routine on plugin (de)activation
 
 = 0.59 =
 
