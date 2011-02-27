@@ -7,15 +7,39 @@
  * and Converter.php
  */
 class MSCR_Update {
-	public static $instance = NULL;
+
+	/**
+	 * An instance of this class
+	 *
+	 * @var object
+	 */
+	public static $instance = null;
+
+	/**
+	 * Update cache
+	 *
+	 * @var array
+	 */
 	private $updates = array();
+
+	/**
+	 * The file to check for a new version of
+	 *
+	 * @var string
+	 */
 	private $file = '';
+
+	/**
+	 * Update check interval
+	 *
+	 * @var int
+	 */
 	private $timeout = 86400;
 
 	/**
 	 * Constructor
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	protected function __construct() {
 		$this->updates = get_site_transient( 'mscr_update' );
@@ -24,7 +48,7 @@ class MSCR_Update {
 	/**
 	 * Get the MSCR Update instance
 	 *
-	 * @return	object
+	 * @return object
 	 */
 	public static function instance() {
 		if( ! self::$instance )
@@ -40,24 +64,24 @@ class MSCR_Update {
 	 * 3. does the sha1 match the revision version of the file from rss?
 	 * 4. display update notice, with link to changeset
 	 *
-	 * @return	bool
+	 * @return bool
 	 */
 	public function update_check() {
 		// TODO: Make this more efficient/responsive so it doesn't
 		// TODO: look like Wordpress is really slow
 
-		if( !$this->can_update() )
-			return FALSE;
+		if( ! $this->can_update() )
+			return false;
 
 		// Is it time to check for updates?
-		if( $this->updates !== FALSE )
-			return FALSE;
+		if( $this->updates !== false )
+			return false;
 
 		// Initialise the update cache
 		$this->updates['updates'] = array();
 
 		// Suppress libxml parsing errors
-		$libxml_use_errors = libxml_use_internal_errors( TRUE );
+		$libxml_use_errors = libxml_use_internal_errors( true );
 
 		foreach( array( 'default_filter.xml', 'Converter.php' ) as $file ) {
 			$this->file = $file;
@@ -72,7 +96,7 @@ class MSCR_Update {
 			$responses = $this->updates['updates'][$file]->responses;
 			if( $responses['sha1'] == '' OR $responses['rss'] == '' ) {
 				$this->abort();
-				return FALSE;
+				return false;
 			}
 
 			// Does the sha1 differ?
@@ -89,12 +113,12 @@ class MSCR_Update {
 			$details->revision = preg_replace('/Revision (\d+).+/si', '$1', $rss->channel->item->title);
 			$details->date = (string) $rss->channel->item->pubDate;
 			$details->revision_url = (string) $rss->channel->item->guid;
-			$details->revision_file_url = "https://trac.php-ids.org/index.fcgi/export/{$details->revision}/trunk/lib/IDS/{$this->file}";
+			$details->revision_file_url = "https://trac.phpids.org/index.fcgi/export/{$details->revision}/trunk/lib/IDS/{$this->file}";
 
 			// Did we parse the revision number correctly?
 			if( ! ctype_digit( $details->revision ) ) {
 				$this->abort();
-				return FALSE;
+				return false;
 			}
 		}
 
@@ -106,7 +130,6 @@ class MSCR_Update {
 
 		// TODO: Extra validation step
 		// TODO: Check revision_file_url sha1 and compare to remote sha1
-		// TODO: If the sha1's are the same then we can run the update
 
 		set_site_transient( 'mscr_update', $this->updates, $this->timeout );
 	}
@@ -115,34 +138,45 @@ class MSCR_Update {
 	/**
 	 * Is it a good time to check for updates?
 	 *
-	 * @return	bool
+	 * @return bool
 	 */
 	private function can_update() {
 		// Don't check for updates on wp-login.php, this happens when you request
 		// an admin page but are not logged in and then redirected to wp-login.php
-		if( FALSE === wp_validate_auth_cookie() )
-			return FALSE;
+		if( false === wp_validate_auth_cookie() )
+			return false;
 
-		// Don't check for updates during the update process
+		// Don't run on plugin activation/deactivation, request will seem slow
+		foreach( array( 'activate', 'deactivate', 'activate-multi', 'deactivate-multi' ) as $key ) {
+			if( array_key_exists( $key, $_REQUEST ) ) {
+				return false;
+			}
+		}
+
+		// Don't check for updates on the following actions
 		$actions = array(
 			'mscr_upgrade_diff',
 			'mscr_upgrade',
-			'mscr_upgrade_run'
+			'mscr_upgrade_run',
+			'activate',
+			'deactivate',
+			'activate-selected',
+			'deactivate-selected'
 		);
 		if( in_array( MSCR_Utils::get( 'action' ), $actions ) )
-			return FALSE;
+			return false;
 
-		return TRUE;
+		return true;
 	}
 
 	/**
 	 * Fetch the remote sha1 and cache the result
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	private function sha1_fetch() {
 		// Fetch remote sha1
-		$url = 'https://php-ids.org/hash.php?f='.$this->file;
+		$url = 'https://phpids.org/hash.php?f='.$this->file;
 		$response = $this->remote_get( $url );
 		$this->updates['updates'][$this->file] = new stdClass;
 		$this->updates['updates'][$this->file]->responses['sha1'] = $response['body'];
@@ -151,10 +185,10 @@ class MSCR_Update {
 	/**
 	 * Fetch the latest rss revision and cache the result
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	private function rss_fetch() {
-		$url = "https://trac.php-ids.org/index.fcgi/log/trunk/lib/IDS/{$this->file}?limit=1&format=rss";
+		$url = "https://trac.phpids.org/index.fcgi/log/trunk/lib/IDS/{$this->file}?limit=1&format=rss";
 		$response = $this->remote_get( $url );
 		$this->updates['updates'][$this->file]->responses['rss'] = $response['body'];
 	}
@@ -162,30 +196,31 @@ class MSCR_Update {
 	/**
 	 * Check the sha1 to see if we need to update
 	 *
-	 * @return	bool	true if the sha1's are different
+	 * @return bool true if the sha1's are different
 	 */
 	private function sha1_check() {
 		// Get the current sha1
-		$local_file = MSCR_PATH."/lib/IDS/{$this->file}";
+		$local_file = MSCR_PATH."/libraries/IDS/{$this->file}";
 
 		if( ! file_exists( $local_file ) )
-			return FALSE;
+			return false;
 
 		$local_sha1 = sha1_file( $local_file );
 		$remote_sha1 = $this->updates['updates'][$this->file]->responses['sha1'];
 
 		if( $local_sha1 == $remote_sha1 )
-			return FALSE;
+			return false;
 
-		return TRUE;
+		return true;
 	}
 
 	/**
 	 * A wrapper function to wp_remote_get. On error return
 	 * an empty body so we can fail gracefully.
 	 *
-	 * @param	string
-	 * @return	array
+	 * @param string
+	 * @param array
+	 * @return array
 	 */
 	private function remote_get( $url = '', $options = array() ) {
 		$cache = get_site_transient( 'mscr_requests_cache' );
@@ -197,7 +232,7 @@ class MSCR_Update {
 
 		// Default options
 		if( empty( $options ) ) {
-			$options = array( 'sslverify' => FALSE );
+			$options = array( 'sslverify' => false );
 		}
 
 		$response = wp_remote_get( $url, $options );
@@ -220,7 +255,7 @@ class MSCR_Update {
 	/**
 	 * Abort the update process.
 	 *
-	 * @return	void
+	 * @return void
 	 */
 	private function abort() {
 		// Set error flag and try again when the transient expires next
@@ -232,11 +267,13 @@ class MSCR_Update {
 
 	/**
 	 * Display update notices on the update page
+	 *
+	 * @return void
 	 */
 	public function list_mscr_updates() {
 		if( empty( $this->updates['updates'] ) ) {
-			echo '<h3>' . __( 'Mute Screamer' ) . '</h3>';
-			echo '<p>' . __( 'Is up to date.' ) . '</p>';
+			echo '<h3>' . __( 'Mute Screamer', 'mute-screamer' ) . '</h3>';
+			echo '<p>' . __( 'Is up to date.', 'mute-screamer' ) . '</p>';
 			return;
 		}
 
@@ -246,12 +283,14 @@ class MSCR_Update {
 
 	/**
 	 * Display diff of files to be upgraded
+	 *
+	 * @return void
 	 */
 	public function do_upgrade_diff() {
 		$diff_files = array();
 
 		if ( ! current_user_can('update_plugins') )
-			wp_die(__('You do not have sufficient permissions to update Mute Screamer for this site.'));
+			wp_die(__('You do not have sufficient permissions to update Mute Screamer for this site.', 'mute-screamer'));
 
 		check_admin_referer('upgrade-core');
 
@@ -263,14 +302,14 @@ class MSCR_Update {
 				continue;
 
 			// Get local file
-			$local = MSCR_PATH.'/lib/IDS/'.$file;
+			$local = MSCR_PATH.'/libraries/IDS/'.$file;
 
 			if( ! file_exists( $local ) ) {
-				wp_die( new WP_Error( 'mscr_upgrade_file_missing', esc_html($file).' does not exist.' ) );
+				wp_die( new WP_Error( 'mscr_upgrade_file_missing', sprintf( __( '%s does not exist.', 'mute-screamer' ), esc_html($file) ) ) );
 			}
 
 			if( ! @is_readable( $local ) ) {
-				wp_die( new WP_Error( 'mscr_upgrade_file_read_error', 'Can not read file '.esc_html($file).'.' ) );
+				wp_die( new WP_Error( 'mscr_upgrade_file_read_error', sprintf( __( 'Can not read file %s.', 'mute-screamer' ), esc_html($file) ) ) );
 			}
 
 			$local = file_get_contents( $local );
@@ -279,7 +318,7 @@ class MSCR_Update {
 			$remote = $this->remote_get( $this->updates['updates'][$file]->revision_file_url );
 
 			if( $remote['body'] == '' )
-				wp_die( new WP_Error( 'mscr_upgrade_error', 'Could not connect to phpids.org, please try again later.' ) );
+				wp_die( new WP_Error( 'mscr_upgrade_error', __( 'Could not connect to phpids.org, please try again later.', 'mute-screamer' ) ) );
 
 			$remote = $remote['body'];
 
@@ -296,12 +335,13 @@ class MSCR_Update {
 		$url = 'update.php?action=mscr_upgrade_run&files=' . urlencode(implode(',', $files));
 		$url = wp_nonce_url($url, 'bulk-update-mscr');
 
-		$this->admin_header( __('Update Mute Screamer') );
+		$this->admin_header( __( 'Update Mute Screamer', 'mute-screamer' ) );
 
 		$data['url'] = $url;
 		$data['diff_files'] = $diff_files;
 
 		MSCR_Utils::view( 'admin_update_diff', $data );
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 	}
 
 	/**
@@ -309,7 +349,7 @@ class MSCR_Update {
 	 * in /wp-admin/update.php which does not set this up
 	 * for us.
 	 *
-	 * @param string title
+	 * @param string
 	 * @return void
 	 */
 	private function admin_header( $title ) {
@@ -321,27 +361,32 @@ class MSCR_Update {
 
 	/**
 	 * Display upgrade page, setup the iframe to run the upgrade
+	 *
+	 * @return void
 	 */
 	public function do_upgrade() {
 		if ( ! current_user_can( 'update_plugins' ) )
-			wp_die( __( 'You do not have sufficient permissions to update Mute Screamer for this site.' ) );
+			wp_die( __( 'You do not have sufficient permissions to update Mute Screamer for this site.', 'mute-screamer' ) );
 
 		check_admin_referer( 'mscr-upgrade-diff' );
 
-
 		$url = MSCR_Utils::post( 'url' );
+		$this->admin_header( __( 'Update Mute Screamer', 'mute-screamer' ) );
 
-		$this->admin_header( __('Update Mute Screamer') );
-
+		// The $url below will invoke do_upgrade_run
 		echo '<div class="wrap">';
 		screen_icon('plugins');
-		echo '<h2>' . esc_html__('Update Mute Screamer') . '</h2>';
+		echo '<h2>' . __( 'Update Mute Screamer', 'mute-screamer' ) . '</h2>';
 		echo "<iframe src='$url' style='width: 100%; height: 100%; min-height: 750px;' frameborder='0'></iframe>";
 		echo '</div>';
+
+		include(ABSPATH . 'wp-admin/admin-footer.php');
 	}
 
 	/**
 	 * This is in an iframe
+	 *
+	 * @return void
 	 */
 	public function do_upgrade_run() {
 		$upgrade_files = array(
@@ -352,14 +397,14 @@ class MSCR_Update {
 		$files = explode( ',', $files );
 
 		if ( ! current_user_can( 'update_plugins' ) )
-			wp_die( __( 'You do not have sufficient permissions to update Mute Screamer for this site.' ) );
+			wp_die( __( 'You do not have sufficient permissions to update Mute Screamer for this site.', 'mute-screamer' ) );
 
 		check_admin_referer( 'bulk-update-mscr' );
 
 		// Valid files to upgrade?
 		foreach( $files as $key => $val ) {
 			if( ! in_array( $val, $upgrade_files ) )
-				wp_die( __( esc_html($val)." can't be upgraded." ) );
+				wp_die( sprintf( __( "%s can't be upgraded.", 'mute-screamer' ), esc_html($val) ) );
 
 			// Fetch file contents from cache
 			$files[$val] = $this->remote_get( $this->updates['updates'][$val]->revision_file_url );

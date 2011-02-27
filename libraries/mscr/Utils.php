@@ -4,15 +4,20 @@
  * Mute Screamer utils class
  */
 class MSCR_Utils {
-	public static $ip = FALSE;
+	/**
+	 * Client ip address
+	 *
+	 * @var string
+	 */
+	public static $ip = false;
 
 	/**
 	 * Load a template file
 	 *
-	 * @return	void/string
+	 * @return void|string
 	 */
-	public static function view( $view, $vars = array(), $return = FALSE ) {
-		$found = FALSE;
+	public static function view( $view, $vars = array(), $return = false ) {
+		$found = false;
 
 		// Look in Mute Screamer views and the current Wordpress theme directories
 		for( $i = 1; $i < 3; $i++ ) {
@@ -21,19 +26,19 @@ class MSCR_Utils {
 
 			// Does the file exist?
 			if( file_exists($view_path) ) {
-				$found = TRUE;
+				$found = true;
 				break;
 			}
 		}
 
-		if( $found === TRUE ) {
+		if( $found === true ) {
 			extract($vars);
 			ob_start();
 
 			include($view_path);
 
 			// Return the data if requested
-			if( $return === TRUE ) {
+			if( $return === true ) {
 				$buffer = ob_get_contents();
 				@ob_end_clean();
 				return $buffer;
@@ -43,24 +48,23 @@ class MSCR_Utils {
 			@ob_end_clean();
 
 			echo $output;
-		} else if( defined('WP_DEBUG') && WP_DEBUG == TRUE ) {
-			trigger_error('Unable to load the requested view.', E_USER_ERROR);
+		} else if( defined('WP_DEBUG') && WP_DEBUG == true ) {
+			trigger_error(__('Unable to load the requested view.', 'mute-screamer'), E_USER_ERROR);
 		}
 	}
-
 
 	/**
 	 * Create pagination links
 	 *
-	 * @return	string
+	 * @return string
 	 */
 	public static function pagination($current_page = 1, $total_pages = 0, $per_page = 0, $count = 0)
 	{
 		$page_links = paginate_links( array(
 			'base' => add_query_arg( 'paged', '%#%' ),
 			'format' => '',
-			'prev_text' => __('&laquo;'),
-			'next_text' => __('&raquo;'),
+			'prev_text' => __('&laquo;', 'mute-screamer'),
+			'next_text' => __('&raquo;', 'mute-screamer'),
 			'total' => $total_pages,
 			'current' => $current_page
 		));
@@ -69,7 +73,7 @@ class MSCR_Utils {
 			return '';
 		}
 
-		$page_links_text = sprintf( '<span class="displaying-num">' . __( 'Displaying %s&#8211;%s of %s' ) . '</span>%s',
+		$page_links_text = sprintf( '<span class="displaying-num">' . __( 'Displaying %s&#8211;%s of %s', 'mute-screamer' ) . '</span>%s',
 			number_format_i18n( ( $current_page - 1 ) * $per_page + 1 ),
 			number_format_i18n( min( $current_page * $per_page, $count ) ),
 			number_format_i18n( $count ),
@@ -79,11 +83,10 @@ class MSCR_Utils {
 		return "<div class='tablenav-pages'>{$page_links_text}</div>";
 	}
 
-
 	/**
 	 * Get intrusions per page option
 	 *
-	 * @return	integer
+	 * @return integer
 	 */
 	public static function mscr_intrusions_per_page() {
 		$per_page = (int) get_user_option('mscr_intrusions_per_page');
@@ -96,35 +99,39 @@ class MSCR_Utils {
 		return $per_page;
 	}
 
-
 	/**
-	 * Get the current upload path
+	 * Get the current site's upload path
 	 *
-	 * @return	string
+	 * @return string
 	 */
 	public static function upload_path() {
-		$upload_path = get_option( 'upload_path' );
+		$upload_dir = wp_upload_dir();
+		return $upload_dir['basedir'];
+	}
 
-		if ( empty($upload_path) ) {
-			$dir = WP_CONTENT_DIR . '/uploads';
-		} else {
-			$dir = $upload_path;
-			if ( 'wp-content/uploads' == $upload_path ) {
-				$dir = WP_CONTENT_DIR . '/uploads';
-			} elseif ( 0 !== strpos($dir, ABSPATH) ) {
-				// $dir is absolute, $upload_path is (maybe) relative to ABSPATH
-				$dir = path_join( ABSPATH, $dir );
-			}
-		}
+	/**
+	 * Show admin notice if the uploads folder is not writable
+	 *
+	 * @return void
+	 */
+	public static function writable_notice() {
+		echo "<div class='update-nag'>".sprintf( __( "Mute Screamer requires that your uploads folder %s is writable.", 'mute-screamer' ), self::upload_path() )."</div>";
+	}
 
-		return $dir;
+	/**
+	 * Show admin notice for multisite install
+	 *
+	 * @return void
+	 */
+	public static function ms_notice() {
+		echo "<div class='update-nag'>".sprintf( __( "Mute Screamer multisite install currently not supported.", 'mute-screamer' ), self::upload_path() )."</div>";
 	}
 
 
 	/**
 	 * Fetch ip address
 	 *
-	 * @return	string
+	 * @return string
 	 */
 	public static function ip_address() {
 		$ip = '0.0.0.0';
@@ -139,7 +146,7 @@ class MSCR_Utils {
 			foreach( explode(',', $_SERVER[$key]) as $val ) {
 				$ip = trim($val);
 
-				if( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== FALSE ) {
+				if( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false ) {
 					self::$ip = $ip;
 					return $ip;
 				}
@@ -154,9 +161,9 @@ class MSCR_Utils {
 	 * Text diff. This is the same as wp_text_diff, the only
 	 * difference is we use a custom text diff render class.
 	 *
-	 * @param	string the left file to compare
-	 * @param	string the right file to compare
-	 * @return	string Rendered table of diff files
+	 * @param string the left file to compare
+	 * @param string the right file to compare
+	 * @return string Rendered table of diff files
 	 */
 	public static function text_diff( $left_string, $right_string, $args = null ) {
 		$defaults = array( 'title' => '', 'title_left' => '', 'title_right' => '' );
@@ -206,8 +213,8 @@ class MSCR_Utils {
 	/**
 	 * Fetch item from the GET array
 	 *
-	 * @param	string
-	 * @return	string|bool
+	 * @param string
+	 * @return mixed
 	 */
 	public static function get( $index = '' ) {
 		return self::_fetch_from_array( $_GET, $index );
@@ -216,8 +223,8 @@ class MSCR_Utils {
 	/**
 	 * Fetch item from the POST array
 	 *
-	 * @param	string
-	 * @return	string|bool
+	 * @param string
+	 * @return mixed
 	 */
 	public static function post( $index = '' ) {
 		return self::_fetch_from_array( $_POST, $index );
@@ -226,8 +233,8 @@ class MSCR_Utils {
 	/**
 	 * Fetch item from the SERVER array
 	 *
-	 * @param	string
-	 * @return	string|bool
+	 * @param string
+	 * @return mixed
 	 */
 	public static function server( $index = '' ) {
 		return self::_fetch_from_array( $_SERVER, $index );
@@ -236,14 +243,42 @@ class MSCR_Utils {
 	/**
 	 * Fetch items from global arrays
 	 *
-	 * @param	array
-	 * @param	string
-	 * @return	string|bool
+	 * @param array
+	 * @param string
+	 * @return mixed
 	 */
 	private static function _fetch_from_array( $array, $index = '' ) {
 		if( ! isset( $array[$index] ) )
 			return false;
 
 		return $array[$index];
+	}
+
+	/**
+	 * WP Title filter, when setting status 500 header change
+	 * the page title to reflect this
+	 *
+	 * @return string
+	 */
+	public static function filter_wp_title( $title, $sep, $seplocation ) {
+		return 'An Error Was Encountered '.$sep;
+	}
+
+	/**
+	 * Is this a ban request?
+	 *
+	 * @return boolean
+	 */
+	public static function is_ban() {
+		return Mute_Screamer::instance()->is_ban;
+	}
+
+	/**
+	 * Is the current page wp-login.php?
+	 *
+	 * @return boolean
+	 */
+	public static function is_wp_login() {
+		return ( strpos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false );
 	}
 }
