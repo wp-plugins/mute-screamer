@@ -4,7 +4,7 @@ Plugin Name: Mute Screamer
 Plugin URI: https://github.com/ampt/mute-screamer
 Description: <a href="http://phpids.org/">PHPIDS</a> for Wordpress.
 Author: ampt
-Version: 1.0.0-beta
+Version: 1.0.0
 Author URI: http://notfornoone.com/
 */
 
@@ -41,6 +41,7 @@ set_include_path( get_include_path() . PATH_SEPARATOR . MSCR_PATH . '/libraries'
 
 require_once 'mscr/Utils.php';
 require_once 'mscr/Log_Database.php';
+require_once 'mscr/functions.php';
 require_once 'IDS/Init.php';
 require_once 'IDS/Log/Composite.php';
 
@@ -50,7 +51,7 @@ require_once 'IDS/Log/Composite.php';
 class Mute_Screamer {
 
 	const INTRUSIONS_TABLE	= 'mscr_intrusions';
-	const VERSION			= '1.0.0-beta';
+	const VERSION			= '1.0.0';
 	const DB_VERSION		= 2;
 	const POST_TYPE			= 'mscr_ban';
 
@@ -509,11 +510,11 @@ class Mute_Screamer {
 	 */
 	private function admin_message() {
 		$filter = 'mscr_admin_warn_message';
-		$message = __( 'An Error Was Encountered.', 'mute-screamer' );
+		$message = __( 'There was an error with the page you requested.', 'mute-screamer' );
 
 		if( $this->is_ban ) {
 			$filter = 'mscr_admin_ban_message';
-			$message = __( 'Site is unavailable, try again later.', 'mute-screamer' );
+			$message = sprintf( __( 'There was a problem processing your request.', 'mute-screamer' ), get_bloginfo( 'name' ) );
 		}
 
 		$message = apply_filters( $filter, $message );
