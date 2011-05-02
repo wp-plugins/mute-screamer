@@ -2,8 +2,8 @@
 Contributors: ampt
 Tags: phpids, intrusion detection, security, ids
 Requires at least: 3.0
-Tested up to: 3.1
-Stable tag: 1.0.0
+Tested up to: 3.2-bleeding
+Stable tag: 1.0.1
 
 PHPIDS for Wordpress
 
@@ -22,8 +22,8 @@ Features:
 * Log users out of WP Admin
 * Auto updates of default_filter.xml and Converter.php from phpids.org
 * Auto update shows a diff of changes to be updated
-* Ban user when attack is over the ban threshold
-* Ban user when attack exceeds the repeat attack limit
+* Ban client when attack is over the ban threshold
+* Ban client when attack exceeds the repeat attack limit
 * Display ban template and message
 
 == Installation ==
@@ -40,6 +40,16 @@ Use automatic installer or:
 2. Auto update diff
 
 == Changelog ==
+
+= 1.0.1 =
+
+* Fix PHPIDS updater
+* Latest PHPIDS rules and converter
+* Display correct update count in adminbar
+* Fix intrusion search escaping
+* Fix diff table rendering issues
+* Fix upload_dir undefined index
+* Additional output escaping
 
 = 1.0.0 =
 

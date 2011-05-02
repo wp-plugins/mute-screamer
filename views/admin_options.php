@@ -88,8 +88,8 @@
 			</tbody>
 		</table>
 
-		<h3><?php _e( 'User Banning', 'mute-screamer' ); ?></h3>
-		<p><?php _e( 'Users can be banned for attacks over a certain threshold or for a number of repeated attacks.', 'mute-screamer' ); ?></p>
+		<h3><?php _e( 'IP Banning', 'mute-screamer' ); ?></h3>
+		<p><?php _e( 'Clients can be banned for attacks over a certain threshold or for a number of repeated attacks.', 'mute-screamer' ); ?></p>
 		<table class="form-table">
 			<tbody>
 				<tr valign="top">
@@ -108,7 +108,7 @@
 					<th scope="row"><label for="mscr_ban_time"><?php _e( 'Ban time', 'mute-screamer' ); ?></label></th>
 					<td>
 						<input type="text" class="small-text" value="<?php echo esc_attr( $ban_time ); ?>" id="mscr_ban_time" name="mscr_options[ban_time]" />
-						<span class="description"><?php _e( 'Number of seconds a user will be banned.', 'mute-screamer' ); ?></span>
+						<span class="description"><?php _e( 'Number of seconds a client will be banned.', 'mute-screamer' ); ?></span>
 					</td>
 				</tr>
 
@@ -116,7 +116,7 @@
 					<th scope="row"><label for="mscr_ban_threshold"><?php _e( 'Ban threshold', 'mute-screamer' ); ?></label></th>
 					<td>
 						<input type="text" class="small-text" value="<?php echo esc_attr( $ban_threshold ); ?>" id="mscr_ban_threshold" name="mscr_options[ban_threshold]" />
-						<span class="description"><?php _e( 'Minimum impact to ban a user.', 'mute-screamer' ); ?></span>
+						<span class="description"><?php _e( 'Minimum impact to ban a client.', 'mute-screamer' ); ?></span>
 					</td>
 				</tr>
 
@@ -124,7 +124,7 @@
 					<th scope="row"><label for="mscr_attack_repeat_limit"><?php _e( 'Attack repeat limit', 'mute-screamer' ); ?></label></th>
 					<td>
 						<input type="text" class="small-text" value="<?php echo esc_attr( $attack_repeat_limit ); ?>" id="mscr_attack_repeat_limit" name="mscr_options[attack_repeat_limit]" />
-						<span class="description"><?php _e( 'Number of repeated attacks before a user is banned (repeat attacks can be under the ban threshold).', 'mute-screamer' ); ?></span>
+						<span class="description"><?php _e( 'Number of repeated attacks before a client is banned (repeat attacks can be under the ban threshold).', 'mute-screamer' ); ?></span>
 					</td>
 				</tr>
 			</tbody>
@@ -143,7 +143,7 @@
 								<?php _e( 'Example - exlude the POST field my_field: POST.my_field', 'mute-screamer' ); ?><br />
 								<?php _e( 'Example - regular expression exclude: /.*foo/i', 'mute-screamer' ); ?>
 							</label></p>
-							<p><textarea class="large-text code" id="mscr_exception_fields" cols="50" rows="5" name="mscr_options[exception_fields]"><?php echo esc_html( $exception_fields ); ?></textarea></p>
+							<p><textarea class="large-text code" id="mscr_exception_fields" cols="50" rows="5" name="mscr_options[exception_fields]"><?php echo $exception_fields; ?></textarea></p>
 						</fieldset>
 					</td>
 				</tr>
@@ -157,7 +157,7 @@
 								<?php _e( 'Define fields that contain HTML and need preparation before hitting the PHPIDS rules.', 'mute-screamer' ); ?><br />
 								<?php _e( 'Note: Fields must contain valid HTML', 'mute-screamer' ); ?>
 							</label></p>
-							<p><textarea class="large-text code" id="mscr_html_fields" cols="50" rows="5" name="mscr_options[html_fields]"><?php echo esc_html( $html_fields ); ?></textarea></p>
+							<p><textarea class="large-text code" id="mscr_html_fields" cols="50" rows="5" name="mscr_options[html_fields]"><?php echo $html_fields; ?></textarea></p>
 						</fieldset>
 					</td>
 				</tr>
@@ -170,7 +170,7 @@
 							<p><label for="mscr_json_fields">
 								<?php _e( 'Define fields that contain JSON data and should be treated as such.', 'mute-screamer' ); ?>
 							</label></p>
-							<p><textarea class="large-text code" id="mscr_json_fields" cols="50" rows="5" name="mscr_options[json_fields]"><?php echo esc_html( $json_fields ); ?></textarea></p>
+							<p><textarea class="large-text code" id="mscr_json_fields" cols="50" rows="5" name="mscr_options[json_fields]"><?php echo $json_fields; ?></textarea></p>
 						</fieldset>
 					</td>
 				</tr>

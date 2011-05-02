@@ -234,7 +234,7 @@ class MSCR_Admin {
 		if( ! isset( $submenu['index.php'] ) )
 			return;
 
-		$update_count = count( $updates );
+		$update_count = count( $updates['updates'] );
 		$existing_count = 0;
 
 		// Find the update-core submenu
@@ -290,10 +290,10 @@ class MSCR_Admin {
 		$offset = ( $offset < 0 ) ? 0 : $offset;
 
 		// Get results
-		$search = isset( $_GET['intrusions_search'] ) ? esc_attr($_GET['intrusions_search']) : '';
+		$search = isset( $_GET['intrusions_search'] ) ? stripslashes($_GET['intrusions_search']) : '';
 		$search_title = '';
 		if($search) {
-			$search_title = sprintf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;', 'mute-screamer') . '</span>', $search );
+			$search_title = sprintf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;', 'mute-screamer') . '</span>', esc_html( $search ) );
 			$token = '%'.$search.'%';
 			$sql = $wpdb->prepare( "SELECT SQL_CALC_FOUND_ROWS * FROM " . $wpdb->mscr_intrusions . " WHERE (name LIKE %s OR page LIKE %s OR tags LIKE %s OR ip LIKE %s OR impact LIKE %s) ORDER BY created DESC LIMIT %d, %d", $token, $token, $token, $token, $token, $offset, $limit );
 		} else {
@@ -426,6 +426,17 @@ class MSCR_Admin {
 		$options['exception_fields'] = implode("\r\n", $options['exception_fields']);
 		$options['html_fields'] = implode("\r\n", $options['html_fields']);
 		$options['json_fields'] = implode("\r\n", $options['json_fields']);
+
+		// Apply textarea escaping, backwards compat for WordPress 3.0
+		if( function_exists( 'esc_textarea' ) ) {
+			$options['exception_fields'] = esc_textarea( $options['exception_fields'] );
+			$options['html_fields'] = esc_textarea( $options['html_fields'] );
+			$options['json_fields'] = esc_textarea( $options['json_fields'] );
+		} else {
+			$options['exception_fields'] = esc_html( $options['exception_fields'] );
+			$options['html_fields'] = esc_html( $options['html_fields'] );
+			$options['json_fields'] = esc_html( $options['json_fields'] );
+		}
 
 		MSCR_Utils::view('admin_options', $options);
 	}

@@ -7,14 +7,14 @@
 
 	<form action="update.php?action=mscr_upgrade" method="post">
 		<?php wp_nonce_field('mscr-upgrade-diff'); ?>
-		<input type="hidden" name="url" value="<?php echo $url; ?>" />
+		<input type="hidden" name="url" value="<?php echo esc_url( $url ); ?>" />
 		<p><input class="button-secondary" type="submit" value="<?php esc_attr_e('Continue', 'mute-screamer'); ?>" /></p>
 	</form>
 
 	<?php foreach( $diff_files as $file ) : ?>
 	<div class="mscr_diff_file" style="">
 		<div class="meta">
-			<?php echo str_replace( ABSPATH, '', MSCR_PATH.'/libraries/IDS/' ).$file->name; ?>
+			<?php echo str_replace( ABSPATH, '', MSCR_PATH.'/libraries/IDS/' ).esc_html( $file->name ); ?>
 		</div>
 
 		<div class="data">
@@ -22,7 +22,7 @@
 
 			<?php if( ! $file->diff ) : ?>
 
-			<tr><td colspan="2"><div class="updated"><p><?php _e( 'These revisions are identical.', 'mute-screamer' ); ?></p></div></td></tr>
+			<tr><td colspan="2"><div class="mscr-message"><p><?php _e( 'These revisions are identical.', 'mute-screamer' ); ?></p></div></td></tr>
 
 			<?php else : ?>
 
