@@ -2,8 +2,8 @@
 Contributors: ampt
 Tags: phpids, intrusion detection, security, ids
 Requires at least: 3.0
-Tested up to: 3.2-bleeding
-Stable tag: 1.0.1
+Tested up to: 3.1.2
+Stable tag: 1.0.2
 
 PHPIDS for Wordpress
 
@@ -40,6 +40,10 @@ Use automatic installer or:
 2. Auto update diff
 
 == Changelog ==
+
+= 1.0.2 =
+
+* Fix PHPIDS feed
 
 = 1.0.1 =
 
