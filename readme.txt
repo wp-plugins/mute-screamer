@@ -1,9 +1,9 @@
 === Mute Screamer ===
 Contributors: ampt
-Tags: phpids, intrusion detection, security, ids
+Tags: phpids, intrusion detection, security, ids, wordpress phpids
 Requires at least: 3.0
-Tested up to: 3.1.2
-Stable tag: 1.0.2
+Tested up to: 3.2
+Stable tag: 1.0.3
 
 PHPIDS for Wordpress
 
@@ -40,6 +40,14 @@ Use automatic installer or:
 2. Auto update diff
 
 == Changelog ==
+
+= 1.0.3 =
+
+* Latest PHPIDS rules and converter
+* Fix email logger tmp file cleanup
+* Twenty Eleven 500 template
+* Add password fields to default exceptions
+* Minor bug fixes
 
 = 1.0.2 =
 
