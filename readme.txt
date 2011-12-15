@@ -3,7 +3,7 @@ Contributors: ampt
 Tags: phpids, intrusion detection, security, ids, wordpress phpids
 Requires at least: 3.0
 Tested up to: 3.3
-Stable tag: trunk
+Stable tag: 1.0.4
 
 PHPIDS for Wordpress
 
