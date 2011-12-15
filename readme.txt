@@ -133,8 +133,8 @@ Use automatic installer or:
 
 = 0.16 =
 
-* Fix default exceptions list.
-* Merge existing options on activation.
+* Fix default exceptions list
+* Merge existing options on activation
 
 = 0.1 =
 
