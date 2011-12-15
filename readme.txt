@@ -2,8 +2,8 @@
 Contributors: ampt
 Tags: phpids, intrusion detection, security, ids, wordpress phpids
 Requires at least: 3.0
-Tested up to: 3.2
-Stable tag: 1.0.3
+Tested up to: 3.3
+Stable tag: trunk
 
 PHPIDS for Wordpress
 
@@ -40,6 +40,17 @@ Use automatic installer or:
 2. Auto update diff
 
 == Changelog ==
+
+= 1.0.4 =
+
+* Latest PHPIDS rules and converter
+* Update default exceptions
+* Option to disable automatic updates for default_filter.xml and Convertor.php
+* Bulk exclude intrusions
+* Update to PHPIDS 0.7
+* Option to disable intrusion logging
+* WordPress 3.3 compatibility updates
+* Add unit tests
 
 = 1.0.3 =
 
