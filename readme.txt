@@ -143,4 +143,4 @@ Use automatic installer or:
 
 = 0.1 =
 
-* Initial release.
+* Initial release
