@@ -41,6 +41,11 @@ Use automatic installer or:
 
 == Changelog ==
 
+= 1.0.5 =
+
+* Latest PHPIDS rules and converter
+* Fix update fetch error
+
 = 1.0.4 =
 
 * Latest PHPIDS rules and converter
