@@ -2,7 +2,7 @@
 Contributors: ampt
 Tags: phpids, intrusion detection, security, ids, wordpress phpids, xss, sql injection, csrf
 Requires at least: 3.0
-Tested up to: 3.3
+Tested up to: 3.3.2
 Stable tag: trunk
 
 PHPIDS for Wordpress
@@ -26,6 +26,11 @@ Features:
 * Ban client when attack exceeds the repeat attack limit
 * Display ban template and message
 
+Translations:
+
+* Spanish by David Perez - [Closemarketing Diseño Web](http://www.closemarketing.es/)
+
+
 == Installation ==
 
 Use automatic installer or:
@@ -40,6 +45,10 @@ Use automatic installer or:
 2. Auto update diff
 
 == Changelog ==
+
+= 1.0.7 =
+
+* Spanish translsation
 
 = 1.0.6 =
 
