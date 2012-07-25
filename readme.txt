@@ -2,7 +2,7 @@
 Contributors: ampt
 Tags: phpids, intrusion detection, security, ids, wordpress phpids, xss, sql injection, csrf
 Requires at least: 3.0
-Tested up to: 3.3.2
+Tested up to: 3.4.1
 Stable tag: trunk
 
 PHPIDS for Wordpress
